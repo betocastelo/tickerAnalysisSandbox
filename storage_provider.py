@@ -96,13 +96,13 @@ class StorageProvider:
         connection.close()
         self._index_value_is_dirty = True
 
-    def get_index_value(self, date: str):
+    def get_last_index_value_at_date(self, date: str):
         if self._index_value_is_dirty:
             self._repopulate_index_value()
 
         connection = sql.Connection(self._db_file)
         cursor = connection.cursor()
-        value = cursor.execute('select price from index_value where date >= date(?) order by date asc',
+        value = cursor.execute('select price from index_value where date <= date(?) order by date desc',
                                [date]).fetchone()[0]
         connection.close()
         return value
@@ -117,9 +117,6 @@ class StorageProvider:
         self._index_value_is_dirty = False
 
     def get_sector_value_data(self):
-        if self._index_value_is_dirty:
-            self._repopulate_index_value()
-
         connection = sql.Connection(self._db_file)
         cursor = connection.cursor()
         sector_data = cursor.execute(
@@ -128,3 +125,24 @@ class StorageProvider:
         ).fetchall()
         connection.close()
         return sector_data
+
+    def get_relative_sector_distribution(self, date: str):
+        connection = sql.Connection(self._db_file)
+        cursor = connection.cursor()
+        closest_earlier_date_inclusive = cursor.execute('select date from tickers '
+                                                        'where date <= date(?) order by date desc',
+                                                        [date]).fetchone()[0]
+
+        if closest_earlier_date_inclusive is None:
+            return None
+
+        sector_counts = cursor.execute('select sector, count(symbol) from tickers t, symbols s '
+                                       'where t.symbol_id = s.id and date = ? group by sector',
+                                       [closest_earlier_date_inclusive]).fetchall()
+
+        total_count = sum(sector[1] for sector in sector_counts)
+        sector_distributions = {}
+        for sector, count in sector_counts:
+            sector_distributions[sector] = count/total_count
+
+        return sector_distributions
