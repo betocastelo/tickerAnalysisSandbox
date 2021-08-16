@@ -4,7 +4,7 @@ Very basic processing and analysis of a pkl file containing roughly monthly pric
 
 ## Main Components
 
-### `class DataProvider`
+### Class DataProvider
 
 Opens the pkl file and extracts most of the data.
 
@@ -12,7 +12,7 @@ Opens the pkl file and extracts most of the data.
   data relative to the requested symbol.
 * `get_symbols()`: returns a list of all ticker symbols available in the dataset.
 
-### `class StorageProvider`
+### Class StorageProvider
 
 Interacts with a Sqlite db file, creating it if necessary, stores ticker data, and provides some analysis capability.
 
@@ -24,3 +24,12 @@ Interacts with a Sqlite db file, creating it if necessary, stores ticker data, a
 * `get_relative_sector_distribution(date: str)`: returns a dictionary in the format `{sector: relative weight}`, for a
   given date (or nearest earlier date). Relative weight is the number of assets in that sector divided by the total
   number of assets in the index.
+
+## Usage Example
+
+```python
+database = StorageProvider("my_database_file")
+index_value = database.get_last_index_value_at_date('2018-01-31')
+sector_value_data = database.get_sector_value_data()
+sector_distribution = database.get_relative_sector_distribution('2018-12-31')
+```
