@@ -116,6 +116,15 @@ class StorageProvider:
         connection.close()
         self._index_value_is_dirty = False
 
+    def get_ticker_history(self, symbol: str):
+        connection = sql.Connection(self._db_file)
+        cursor = connection.cursor()
+        history = cursor.execute('select date, price from symbols s, tickers t '
+                                 'where s.id = t.symbol_id and s.symbol = ? order by date',
+                                 [symbol]).fetchall()
+        connection.close()
+        return history
+
     def get_sector_value_data(self):
         connection = sql.Connection(self._db_file)
         cursor = connection.cursor()
