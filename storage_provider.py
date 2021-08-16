@@ -116,6 +116,12 @@ class StorageProvider:
         connection.close()
         self._index_value_is_dirty = False
 
+    def get_all_symbols(self):
+        connection = sql.Connection(self._db_file)
+        cursor = connection.cursor()
+        symbols = cursor.execute('select symbol from main.symbols order by symbol asc').fetchall()
+        return [symbol[0] for symbol in symbols]
+
     def get_ticker_history(self, symbol: str):
         connection = sql.Connection(self._db_file)
         cursor = connection.cursor()
