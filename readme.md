@@ -8,7 +8,7 @@ Very basic processing and analysis of a pkl file containing roughly monthly pric
 
 Requires an ASGI server (I used uvicorn, as per FastAPI docs).
 
-To run: `uvicorn main:app --reload`
+To run: `uvicorn ticker_sandbox_rest:app --reload`
 
 This creates a swagger interactive doc page at http://127.0.0.1:8000/docs.
 
