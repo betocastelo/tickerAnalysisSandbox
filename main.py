@@ -1,20 +1,36 @@
+from fastapi import FastAPI
+
 from data_provider import DataProvider
 from storage_provider import StorageProvider
 
-
-def load_data(db_file: str = None):
-    data = DataProvider('data/constituents_history.pkl')
-    db = StorageProvider(db_file)
-
-    for symbol in data.get_symbols():
-        ticker = data.get_ticker(symbol)
-        db.insert_ticker(ticker)
-
-    return db
+app = FastAPI()
+pickle = DataProvider('data/constituents_history.pkl')
+database = StorageProvider()
 
 
-if __name__ == '__main__':
-    database = load_data()
-    index_value = database.get_last_index_value_at_date('2018-01-31')
-    sector_value_data = database.get_sector_value_data()
-    sector_distribution = database.get_relative_sector_distribution('2018-12-31')
+@app.post("/load_data")
+def load_data():
+    """Load the pickle file into the SQLite database file. Note that this operation is not idempotent."""
+    for symbol in pickle.get_symbols():
+        ticker = pickle.get_ticker(symbol)
+        database.insert_ticker(ticker)
+
+
+@app.get("/symbols")
+def get_symbols():
+    """Returns all symbols tracked in the source data."""
+    symbols = pickle.get_symbols()
+    result = {symbol for symbol in symbols}
+    return result
+
+
+@app.get("/symbols/{symbol}")
+def get_price_history(symbol: str):
+    """Returns all pricing data for the given symbol."""
+    history = database.get_ticker_history(symbol)
+
+    results = {}
+    for date, price in history:
+        results[date] = price
+
+    return results
