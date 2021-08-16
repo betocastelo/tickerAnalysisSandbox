@@ -31,9 +31,14 @@ class Sandbox(QDialog):
         selector_layout = QHBoxLayout()
         selector_layout.addWidget(self.symbol_label)
         selector_layout.addWidget(self.symbol_selector)
+        selector_layout.addStretch()
+        clear_button_layout = QHBoxLayout()
+        clear_button_layout.addWidget(self.clear_button)
+        clear_button_layout.addStretch()
         box_layout = QVBoxLayout()
         box_layout.addLayout(selector_layout)
-        box_layout.addWidget(self.clear_button)
+        box_layout.addLayout(clear_button_layout)
+
         db = StorageProvider()
         symbols = db.get_all_symbols()
         self.symbol_selector.addItems(symbols)
@@ -62,6 +67,8 @@ class Sandbox(QDialog):
         self._line_series.append(line)
         self.chart.addSeries(line)
         self.chart.createDefaultAxes()
+        self.chart.axisX().hide()
 
     def _clear_display(self):
         self.chart.removeAllSeries()
+        self.chart.axisY().hide()
