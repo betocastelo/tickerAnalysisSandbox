@@ -4,6 +4,14 @@ Very basic processing and analysis of a pkl file containing roughly monthly pric
 
 ## Main Components
 
+### Rest Service
+
+Requires an ASGI server (I used uvicorn, as per FastAPI docs).
+
+To run: `uvicorn main:app --reload`
+
+This creates a swagger interactive doc page at http://127.0.0.1:8000/docs.
+
 ### Class DataProvider
 
 Opens the pkl file and extracts most of the data.
@@ -25,7 +33,7 @@ Interacts with a Sqlite db file, creating it if necessary, stores ticker data, a
   given date (or nearest earlier date). Relative weight is the number of assets in that sector divided by the total
   number of assets in the index.
 
-## Usage Example
+## Programmatic Usage Example
 
 ```python
 database = StorageProvider("my_database_file")
